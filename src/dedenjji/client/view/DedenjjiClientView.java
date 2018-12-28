@@ -12,7 +12,7 @@ public class DedenjjiClientView extends JFrame {
 
 	private JTextArea jtaLogs;
 	private JScrollPane jspLogs;
-	private JButton jbConnectServer;
+	private JButton jbConnectToServer;
 	private JButton jbSend;
 	private JButton jbClose;
 	private JComboBox<String> jcbTeam;
@@ -25,7 +25,7 @@ public class DedenjjiClientView extends JFrame {
 		jtaLogs = new JTextArea();
 		jspLogs = new JScrollPane(jtaLogs);
 		jspLogs.setBorder(new TitledBorder("System Log"));
-		jbConnectServer = new JButton("Connect Server");
+		jbConnectToServer = new JButton("Connect Server");
 		jbSend = new JButton("Send");
 		jbClose = new JButton("Close");
 		jcbTeam = new JComboBox<String>(team);
@@ -33,13 +33,13 @@ public class DedenjjiClientView extends JFrame {
 		setLayout(null);
 		
 		jspLogs.setBounds(15, 10, 405, 200);
-		jbConnectServer.setBounds(15, 220, 130, 30);
+		jbConnectToServer.setBounds(15, 220, 130, 30);
 		jcbTeam.setBounds(155, 220, 100, 30);
 		jbSend.setBounds(270, 220, 70, 30);
 		jbClose.setBounds(350, 220, 70, 30);
 		
 		add(jspLogs);
-		add(jbConnectServer);
+		add(jbConnectToServer);
 		add(jcbTeam);
 		add(jbSend);
 		add(jbClose);
@@ -48,5 +48,24 @@ public class DedenjjiClientView extends JFrame {
 		setResizable(false);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	public JTextArea getJtaLogs() {
+		return jtaLogs;
+	}
+	public JScrollPane getJspLogs() {
+		return jspLogs;
+	}
+	public JButton getJbConnectToServer() {
+		return jbConnectToServer;
+	}
+	public JButton getJbSend() {
+		return jbSend;
+	}
+	public JButton getJbClose() {
+		return jbClose;
+	}
+	public JComboBox<String> getJcbTeam() {
+		return jcbTeam;
 	}
 }
