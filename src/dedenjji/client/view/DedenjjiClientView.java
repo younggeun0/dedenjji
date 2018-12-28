@@ -7,6 +7,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
+import dedenjji.client.evt.DedenjjiClientEvt;
+
 @SuppressWarnings("serial")
 public class DedenjjiClientView extends JFrame {
 
@@ -43,6 +45,11 @@ public class DedenjjiClientView extends JFrame {
 		add(jcbTeam);
 		add(jbSend);
 		add(jbClose);
+		
+		DedenjjiClientEvt dce = new DedenjjiClientEvt(this);
+		jbConnectToServer.addActionListener(dce);
+		jbSend.addActionListener(dce);
+		jbClose.addActionListener(dce);
 		
 		setBounds(400, 200, 450, 300);
 		setResizable(false);

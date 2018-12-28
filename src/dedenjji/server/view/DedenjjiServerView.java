@@ -30,7 +30,7 @@ public class DedenjjiServerView extends JFrame {
 		jtaLogs = new JTextArea();
 		jspLogs = new JScrollPane(jtaLogs);
 		jspLogs.setBorder(new TitledBorder("System Log"));
-		jbServerOnOff = new JButton("Start");
+		jbServerOnOff = new JButton("Open");
 		jbShowResult = new JButton("Show Result");
 		jbSaveLog = new JButton("Save Log");
 		jbExit = new JButton("Exit");
