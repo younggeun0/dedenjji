@@ -68,6 +68,7 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 			dsh.setClient(server.accept());
 			// client가 접속하여 생긴 socket을 리스트로 추가
 			listClient.add(dsh);
+			new Thread(dsh).start();
 			
 		} catch (IOException ie) {
 			ie.printStackTrace();

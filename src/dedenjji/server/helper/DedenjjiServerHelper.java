@@ -24,8 +24,17 @@ public class DedenjjiServerHelper implements Runnable {
 		}
 	}
 	
-	public synchronized void broadcast(String msg) {
+	public synchronized void broadcast(String msg) throws IOException {
 		// 한번에 하나의 쓰레드만 호출가능, 매개변수로 들어오는 메시지를 모든 접속자에게 출력
+		try {
+			dos = new DataOutputStream(client.getOutputStream());
+			dos.writeUTF(msg);
+			dos.flush();
+		} finally {
+			if (dos != null) {
+				dos.close();
+			}
+		}
 	}
 
 	public void setClient(Socket client) {
