@@ -9,16 +9,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
+import dedenjji.server.helper.DedenjjiServerHelper;
 import dedenjji.server.view.DedenjjiServerView;
 
-public class DedenjjiServerEvt implements ActionListener {
+public class DedenjjiServerEvt implements ActionListener, Runnable {
 	
 	private DedenjjiServerView dsv;
 	private boolean serverFlag;
 	private ServerSocket server;
-	private List<Socket> listClient;
-	private DataInputStream dis;
-	private DataOutputStream dos;
+	private List<DedenjjiServerHelper> listClient;
+	private Thread operThread;
 	
 	public DedenjjiServerEvt(DedenjjiServerView dsv) {
 		this.dsv = dsv;
@@ -33,32 +33,13 @@ public class DedenjjiServerEvt implements ActionListener {
 				dsv.getJtaLogs().append("서버 구동 시작...\n");
 				dsv.getJbServerOnOff().setText("Close");
 				
-				/*try {
-					// 소켓생성
-					server = new ServerSocket(6000);
-					// client가 접속하여 생긴 socket을 리스트로 추가
-					listClient.add(server.accept());
-					
-				} catch (IOException ie) {
-					ie.printStackTrace();
-				} finally {
-					if (server != null) { 
-						try {
-							server.close();
-						} catch (IOException ie) {
-							ie.printStackTrace();
-						}
-					}
-				}*/
+				operThread = new Thread(this);
+				operThread.start();
+				
 			} else {
 				// server off
 				dsv.getJbServerOnOff().setText("Open");
 				dsv.getJtaLogs().append("서버를 종료하였습니다...\n");
-				/*try {
-					close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}*/
 			}
 		}
 		if (e.getSource() == dsv.getJbShowResult()) {
@@ -75,20 +56,29 @@ public class DedenjjiServerEvt implements ActionListener {
 		}
 	}
 	
-	public void close() throws IOException {
-		if (server != null) {
-			server.close();
-		}
-		for (int i=0; i<listClient.size(); i++) {
-			if (listClient.get(i) != null) {
-				listClient.get(i).close();
+	@Override
+	public void run() {
+
+		// 서버 소켓 열기, 접속자 받기 Thread처리
+		DedenjjiServerHelper dsh;
+		try {
+			// 소켓생성
+			server = new ServerSocket(6000);
+			dsh = new DedenjjiServerHelper();
+			dsh.setClient(server.accept());
+			// client가 접속하여 생긴 socket을 리스트로 추가
+			listClient.add(dsh);
+			
+		} catch (IOException ie) {
+			ie.printStackTrace();
+		} finally {
+			if (server != null) { 
+				try {
+					server.close();
+				} catch (IOException ie) {
+					ie.printStackTrace();
+				}
 			}
-		}
-		if (dis != null) {
-			dis.close();
-		}
-		if (dos != null) {
-			dos.close();
 		}
 	}
 }
