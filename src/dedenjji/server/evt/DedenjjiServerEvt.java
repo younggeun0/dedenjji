@@ -11,6 +11,7 @@ import java.util.List;
 
 import dedenjji.server.helper.DedenjjiServerHelper;
 import dedenjji.server.view.DedenjjiServerView;
+import sun.security.util.DisabledAlgorithmConstraints;
 
 public class DedenjjiServerEvt implements ActionListener, Runnable {
 	
@@ -66,6 +67,8 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 			server = new ServerSocket(6000);
 			dsh = new DedenjjiServerHelper();
 			dsh.setClient(server.accept());
+			dsv.getJtaLogs().append("서버에 Client가 접속했습니다.");
+			
 			// client가 접속하여 생긴 socket을 리스트로 추가
 			listClient.add(dsh);
 			new Thread(dsh).start();

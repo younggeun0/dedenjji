@@ -18,7 +18,8 @@ public class DedenjjiServerHelper implements Runnable {
 		try {
 			dis = new DataInputStream(client.getInputStream());
 			result = dis.readUTF();
-			broadcast(result);
+			System.out.println(result);
+//			broadcast(result);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -29,6 +30,7 @@ public class DedenjjiServerHelper implements Runnable {
 		try {
 			dos = new DataOutputStream(client.getOutputStream());
 			dos.writeUTF(msg);
+			System.out.println(msg);
 			dos.flush();
 		} finally {
 			if (dos != null) {
@@ -39,5 +41,15 @@ public class DedenjjiServerHelper implements Runnable {
 
 	public void setClient(Socket client) {
 		this.client = client;
+	}
+
+	public Socket getClient() {
+		return client;
+	}
+	public DataInputStream getDis() {
+		return dis;
+	}
+	public DataOutputStream getDos() {
+		return dos;
 	}
 }

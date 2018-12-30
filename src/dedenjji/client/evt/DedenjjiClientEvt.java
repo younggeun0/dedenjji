@@ -23,6 +23,10 @@ public class DedenjjiClientEvt implements ActionListener {
 		this.dcv = dcv;
 	}
 	
+	public void sendChoice(String nick) throws IOException {
+		
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == dcv.getJbConnectToServer()) {
@@ -31,37 +35,12 @@ public class DedenjjiClientEvt implements ActionListener {
 			if (client == null) {
 				try {
 					client = new Socket("localhost", 6000);
+					dos = new DataOutputStream(client.getOutputStream());
+					dos.writeUTF(nick);
 					
-					
-					
-					
-				} catch (UnknownHostException uhe) {
-					uhe.printStackTrace();
 				} catch (IOException ie) {
 					ie.printStackTrace();
-				} finally {
-					if (client != null) {
-						try {
-							client.close();
-						} catch (IOException ie) {
-							ie.printStackTrace();
-						}
-					}
-					if (dis != null) {
-						try {
-							dis.close();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					}
-					if (dos != null) {
-						try {
-							dos.close();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					}
-				}
+				} 
 			} else {
 				JOptionPane.showMessageDialog(dcv, "이미 접속중입니다.");
 				return;
@@ -70,10 +49,24 @@ public class DedenjjiClientEvt implements ActionListener {
 		
 		if (e.getSource() == dcv.getJbSend()) {
 			System.out.println(dcv.getJcbTeam().getSelectedItem());
+			/*try {
+//				sendChoice();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}*/
+			
 		}
 		
 		if (e.getSource() == dcv.getJbClose()) {
 			dcv.dispose();
+			
+			if (client != null) {
+				try {
+					client.close();
+				} catch (IOException ie) {
+					ie.printStackTrace();
+				}
+			}
 		}
 	}
 }
