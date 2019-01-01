@@ -2,18 +2,23 @@ package dedenjji.server.evt;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.DefaultListModel;
 
 import dedenjji.server.helper.DedenjjiServerHelper;
 import dedenjji.server.view.DedenjjiServerView;
 import sun.security.util.DisabledAlgorithmConstraints;
 
-public class DedenjjiServerEvt implements ActionListener, Runnable {
+public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, Runnable {
 	
 	private DedenjjiServerView dsv;
 	private boolean serverFlag;
@@ -23,6 +28,7 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 	
 	public DedenjjiServerEvt(DedenjjiServerView dsv) {
 		this.dsv = dsv;
+		listClient = new ArrayList<DedenjjiServerHelper>();
 	}
 
 	@Override
@@ -31,7 +37,7 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 			serverFlag = !serverFlag;
 			if (serverFlag) {
 				// server on
-				dsv.getJtaLogs().append("서버 구동 시작...\n");
+				dsv.getJtaLogs().append("[server]: 서버 구동 시작...\n");
 				dsv.getJbServerOnOff().setText("Close");
 				
 				operThread = new Thread(this);
@@ -40,7 +46,8 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 			} else {
 				// server off
 				dsv.getJbServerOnOff().setText("Open");
-				dsv.getJtaLogs().append("서버를 종료하였습니다...\n");
+				dsv.getJtaLogs().append("[server]: 서버를 종료하였습니다...\n");
+				close();
 			}
 		}
 		if (e.getSource() == dsv.getJbShowResult()) {
@@ -62,27 +69,48 @@ public class DedenjjiServerEvt implements ActionListener, Runnable {
 
 		// 서버 소켓 열기, 접속자 받기 Thread처리
 		DedenjjiServerHelper dsh;
+		String nick;
+		Thread thClient;
 		try {
-			// 소켓생성
 			server = new ServerSocket(6000);
-			dsh = new DedenjjiServerHelper();
-			dsh.setClient(server.accept());
-			dsv.getJtaLogs().append("서버에 Client가 접속했습니다.");
-			
-			// client가 접속하여 생긴 socket을 리스트로 추가
-			listClient.add(dsh);
-			new Thread(dsh).start();
-			
+			while(true) {
+				// 소켓생성
+				dsh = new DedenjjiServerHelper();
+				dsh.setClient(server.accept());
+				dsh.setDsv(dsv);
+				dsh.setDis(dsh.getClient().getInputStream());
+				dsh.setDos(dsh.getClient().getOutputStream());
+				nick = dsh.getDis().readUTF();
+				dsh.setNick(nick);
+				dsv.getJtaLogs().append("[server]: 서버에 "+nick+"님이 접속했습니다.\n");
+				dsv.getDlm().addElement(nick);
+
+				// client가 접속하여 생긴 socket을 리스트로 추가
+				listClient.add(dsh);
+				thClient = new Thread(dsh);
+				thClient.start();
+			}
 		} catch (IOException ie) {
 			ie.printStackTrace();
-		} finally {
-			if (server != null) { 
-				try {
-					server.close();
-				} catch (IOException ie) {
-					ie.printStackTrace();
-				}
+		}
+	}
+	
+	public void close() {
+		if (server != null) {
+			try {
+				server.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
+	}
+	
+	@Override
+	public void windowClosing(WindowEvent e) {
+		dsv.dispose();
+	}
+	@Override
+	public void windowClosed(WindowEvent e) {
+		close();
 	}
 }

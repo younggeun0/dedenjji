@@ -1,5 +1,6 @@
 package dedenjji.server.view;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -13,6 +14,7 @@ import dedenjji.server.evt.DedenjjiServerEvt;
 public class DedenjjiServerView extends JFrame {
 
 	private JList<String> jlClients;
+	private DefaultListModel<String> dlm;
 	private JScrollPane jspClients;
 	private JTextArea jtaLogs;
 	private JScrollPane jspLogs;
@@ -24,7 +26,8 @@ public class DedenjjiServerView extends JFrame {
 	public DedenjjiServerView() {
 		super("Dedenjji Server");
 		
-		jlClients = new JList<String>();
+		dlm = new DefaultListModel<String>();
+		jlClients = new JList<String>(dlm);
 		jspClients = new JScrollPane(jlClients);
 		jspClients.setBorder(new TitledBorder("Users"));
 		jtaLogs = new JTextArea();
@@ -60,7 +63,6 @@ public class DedenjjiServerView extends JFrame {
 		setBounds(400, 200, 445, 400);
 		setResizable(false);
 		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	public JList<String> getJlClients() {
@@ -86,5 +88,11 @@ public class DedenjjiServerView extends JFrame {
 	}
 	public JScrollPane getJspLogs() {
 		return jspLogs;
+	}
+	public DefaultListModel<String> getDlm() {
+		return dlm;
+	}
+	public void setDlm(DefaultListModel<String> dlm) {
+		this.dlm = dlm;
 	}
 }
