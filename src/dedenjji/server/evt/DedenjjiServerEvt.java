@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,10 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 
 import dedenjji.server.helper.DedenjjiServerHelper;
 import dedenjji.server.view.DedenjjiServerView;
-import sun.security.util.DisabledAlgorithmConstraints;
 
 public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, Runnable {
 	
@@ -24,7 +23,7 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 	private boolean serverFlag;
 	private ServerSocket server;
 	private List<DedenjjiServerHelper> listClient;
-	private Thread operThread;
+	private Thread serverThread;
 	
 	public DedenjjiServerEvt(DedenjjiServerView dsv) {
 		this.dsv = dsv;
@@ -37,12 +36,8 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			serverFlag = !serverFlag;
 			if (serverFlag) {
 				// server on
-				dsv.getJtaLogs().append("[server]: 서버 구동 시작...\n");
-				dsv.getJbServerOnOff().setText("Close");
-				
-				operThread = new Thread(this);
-				operThread.start();
-				
+				serverThread = new Thread(this);
+				serverThread.start();
 			} else {
 				// server off
 				dsv.getJbServerOnOff().setText("Open");
@@ -66,42 +61,37 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 	
 	@Override
 	public void run() {
-
-		// 서버 소켓 열기, 접속자 받기 Thread처리
-		DedenjjiServerHelper dsh;
-		String nick;
-		Thread thClient;
 		try {
 			server = new ServerSocket(6000);
-			while(true) {
-				// 소켓생성
-				dsh = new DedenjjiServerHelper();
-				dsh.setClient(server.accept());
-				dsh.setDsv(dsv);
-				dsh.setDis(dsh.getClient().getInputStream());
-				dsh.setDos(dsh.getClient().getOutputStream());
-				nick = dsh.getDis().readUTF();
-				dsh.setNick(nick);
-				dsv.getJtaLogs().append("[server]: 서버에 "+nick+"님이 접속했습니다.\n");
-				dsv.getDlm().addElement(nick);
-
-				// client가 접속하여 생긴 socket을 리스트로 추가
+			dsv.getJtaLogs().append("[server]: 서버 구동 시작...\n");
+			dsv.getJbServerOnOff().setText("Close");
+			
+			Socket someClient = null;
+			DedenjjiServerHelper dsh = null;
+			DefaultListModel<String> dlmTemp = dsv.getDlm();
+			JTextArea jtaTemp = dsv.getJtaLogs();
+			for(int cnt=1;;cnt++) {
+				someClient = server.accept();
+				dsh = new DedenjjiServerHelper(someClient, dlmTemp, jtaTemp, cnt, dsv, listClient);
+				
 				listClient.add(dsh);
-				thClient = new Thread(dsh);
-				thClient.start();
+				dsh.start();
 			}
 		} catch (IOException ie) {
+			JOptionPane.showMessageDialog(dsv, "소켓 생성 실패");
 			ie.printStackTrace();
 		}
 	}
 	
 	public void close() {
-		if (server != null) {
-			try {
+		try {
+			if (server != null) {
 				server.close();
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			System.exit(0);
 		}
 	}
 	

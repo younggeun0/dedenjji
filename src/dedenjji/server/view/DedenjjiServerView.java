@@ -31,6 +31,7 @@ public class DedenjjiServerView extends JFrame {
 		jspClients = new JScrollPane(jlClients);
 		jspClients.setBorder(new TitledBorder("Users"));
 		jtaLogs = new JTextArea();
+		jtaLogs.setEditable(false);
 		jspLogs = new JScrollPane(jtaLogs);
 		jspLogs.setBorder(new TitledBorder("System Log"));
 		jbServerOnOff = new JButton("Open");
