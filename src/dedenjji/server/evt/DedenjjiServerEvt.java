@@ -36,12 +36,22 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			serverFlag = !serverFlag;
 			if (serverFlag) {
 				// server on
+				dsv.getJtaLogs().append("서버 구동 시작...\n");
+				dsv.getJbServerOnOff().setText("Close");
+				
+				try {
+					server = new ServerSocket(6000);
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(dsv, "서버 구동 실패");
+					e1.printStackTrace();
+				}
+				
 				serverThread = new Thread(this);
 				serverThread.start();
 			} else {
 				// server off
 				dsv.getJbServerOnOff().setText("Open");
-				dsv.getJtaLogs().append("[server]: 서버를 종료하였습니다...\n");
+				JOptionPane.showMessageDialog(dsv, "서버를 종료합니다..");
 				close();
 			}
 		}
@@ -56,16 +66,13 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 		}
 		if (e.getSource() == dsv.getJbExit()) {
 			dsv.dispose();
+			close();
 		}
 	}
 	
 	@Override
 	public void run() {
 		try {
-			server = new ServerSocket(6000);
-			dsv.getJtaLogs().append("[server]: 서버 구동 시작...\n");
-			dsv.getJbServerOnOff().setText("Close");
-			
 			Socket someClient = null;
 			DedenjjiServerHelper dsh = null;
 			DefaultListModel<String> dlmTemp = dsv.getDlm();
@@ -73,7 +80,6 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			for(int cnt=1;;cnt++) {
 				someClient = server.accept();
 				dsh = new DedenjjiServerHelper(someClient, dlmTemp, jtaTemp, cnt, dsv, listClient);
-				
 				listClient.add(dsh);
 				dsh.start();
 			}

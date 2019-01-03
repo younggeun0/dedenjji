@@ -29,7 +29,8 @@ public class DedenjjiServerHelper extends Thread {
 	private int cnt;
 	private JFrame jf;
 	
-	public DedenjjiServerHelper(Socket client, DefaultListModel<String> dlmClients, JTextArea jtaLogs, int cnt,
+	public DedenjjiServerHelper(Socket client, DefaultListModel<String> dlmClients, 
+			JTextArea jtaLogs, int cnt,
 			JFrame jf, List<DedenjjiServerHelper> listClient) {
 		this.client = client;
 		this.jtaLogs = jtaLogs;
@@ -41,7 +42,11 @@ public class DedenjjiServerHelper extends Thread {
 		try {
 			readStream = new DataInputStream(client.getInputStream());
 			writeStream = new DataOutputStream(client.getOutputStream());
-			broadcast("["+cnt+"] 번째 접속자가 접속했습니다.");
+			
+			nick = readStream.readUTF();
+			dlmClients.addElement(nick);
+			broadcast("["+cnt+"]번째 접속자 ["+nick+"]님이 접속했습니다.");
+			jtaLogs.append(nick+"님이 접속하였습니다.\n");
 		} catch (IOException ie) {
 			JOptionPane.showMessageDialog(jf, "접속자 연결 중 문제 발생...");
 			ie.printStackTrace();
@@ -52,18 +57,19 @@ public class DedenjjiServerHelper extends Thread {
 	public void run() {
 		if(readStream != null) {
 			String revMsg = "";
-			
+			String nick = "";
 			try {
 				while (true) {
 					revMsg = readStream.readUTF();
-					broadcast(revMsg);
+					jtaLogs.append(revMsg+"\n");
+					nick = revMsg.substring(revMsg.indexOf("[")+1, revMsg.indexOf("]"));
+					System.out.println(nick);
+					broadcast(nick+"님이 선택하셨습니다.");
 				}
 			} catch (IOException ie) {
-				
 				ie.printStackTrace();
 			}
 		}
-//				dsv.getJtaLogs().append("[server]:"+nick+"님이 "+team+"을 선택하였습니다.\n");
 	}
 	
 	// 한번에 하나의 쓰레드만 호출가능, 매개변수로 들어오는 메시지를 모든 접속자에게 출력
@@ -80,14 +86,6 @@ public class DedenjjiServerHelper extends Thread {
 			JOptionPane.showMessageDialog(jf, "["+cnt+"]번째 접속자에게 메세지를 보낼 수 없습니다.");
 			ie.printStackTrace();
 		}
-		
-		
-		/*for(int i=0; i<dse.getListClient().size(); i++) {
-			// 접속하자마자 유저들에게 뿌려야함..
-			dse.getListClient().get(i).dos.writeUTF("[server]: 현재 접속 인원은 "+dse.getListClient().size()+"명 입니다.\n");
-//			dse.getListClient().get(i).dos.writeUTF("[server]:"+nick+"님이 팀을 선택하였습니다.\n");
-			dse.getListClient().get(i).dos.flush();
-		}*/
 	}
 	
 	public void setClient(Socket client) {

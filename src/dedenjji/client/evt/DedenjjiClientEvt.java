@@ -48,8 +48,12 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 				nick = JOptionPane.showInputDialog(dcv, "서버에 접속할 닉네임을 입력해주세요.");
 				try {
 					client = new Socket("localhost", 6000);
+					dcv.getJtaLogs().setText(nick+"으로 서버에 접속했습니다..\n");
 					writeStream = new DataOutputStream(client.getOutputStream());
 					readStream = new DataInputStream(client.getInputStream());
+					
+					writeStream.writeUTF(nick);
+					writeStream.flush();
 					
 					Thread readThread = new Thread(this);
 					readThread.start();
@@ -86,7 +90,6 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 		try {
 			writeStream.writeUTF(msg);
 			writeStream.flush();
-//			dcv.getJtaLogs().append("[client]: 서버에  선택("+team+")을 전송하였습니다.\n");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
