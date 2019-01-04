@@ -25,6 +25,7 @@ public class DedenjjiClientView extends JFrame {
 		String[] team = new String[]{ "¾Õ", "µÚ" };
 		
 		jtaLogs = new JTextArea();
+		jtaLogs.setEditable(false);
 		jspLogs = new JScrollPane(jtaLogs);
 		jspLogs.setBorder(new TitledBorder("System Log"));
 		jbConnectToServer = new JButton("Connect Server");

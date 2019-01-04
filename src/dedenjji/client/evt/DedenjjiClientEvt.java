@@ -33,10 +33,15 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 		try {
 			while(true) {
 				serverMsg = readStream.readUTF();
+				
+				if(serverMsg.equals("팀 분배에 실패했습니다.. 다시 선택해주세요.")) {
+					sendFlag = false;
+				}
+				
 				dcv.getJtaLogs().append(serverMsg+"\n");
 			}
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(dcv, "서버로부터 로그를 읽어올 수 없습니다.");
+			JOptionPane.showMessageDialog(dcv, "서버와 연결이 끊겼습니다.");
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +53,7 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 				nick = JOptionPane.showInputDialog(dcv, "서버에 접속할 닉네임을 입력해주세요.");
 				try {
 					client = new Socket("localhost", 6000);
-					dcv.getJtaLogs().setText(nick+"으로 서버에 접속했습니다..\n");
+					dcv.getJtaLogs().setText("["+nick+"]으로 서버에 접속했습니다..\n");
 					writeStream = new DataOutputStream(client.getOutputStream());
 					readStream = new DataInputStream(client.getInputStream());
 					
