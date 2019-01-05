@@ -61,7 +61,7 @@ public class DedenjjiServerView extends JFrame {
 		jbSaveLog.addActionListener(dse);
 		jbExit.addActionListener(dse);
 		
-		setBounds(400, 200, 445, 400);
+		setBounds(1200, 200, 445, 400);
 		setResizable(false);
 		setVisible(true);
 	}

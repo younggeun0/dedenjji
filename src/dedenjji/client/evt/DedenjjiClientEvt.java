@@ -29,7 +29,7 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 	
 	@Override
 	public void run() {
-		String serverMsg;
+		String serverMsg = "";
 		try {
 			while(true) {
 				serverMsg = readStream.readUTF();
@@ -39,6 +39,7 @@ public class DedenjjiClientEvt extends WindowAdapter implements ActionListener, 
 				}
 				
 				dcv.getJtaLogs().append(serverMsg+"\n");
+				dcv.getJspLogs().getVerticalScrollBar().setValue(dcv.getJspLogs().getVerticalScrollBar().getMaximum());
 			}
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(dcv, "서버와 연결이 끊겼습니다.");

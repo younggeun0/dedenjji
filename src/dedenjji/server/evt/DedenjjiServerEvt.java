@@ -75,7 +75,6 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			}
 		}
 		if (e.getSource() == dsv.getJbExit()) {
-			dsv.dispose();
 			close();
 		}
 	}
@@ -84,34 +83,70 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 		List<String> listTeamFront = new ArrayList<String>(); 
 		List<String> listTeamBack = new ArrayList<String>();
 		DedenjjiServerHelper tempSh = null;
-		for (int i = 0; i < listClient.size(); i++) {
-			tempSh = listClient.get(i);
-			// 팀인원이 짝수일테고 결과가 size/2 개의 길이로 리스트에 들어간다면
-			if (tempSh.getTeam().equals("앞")) {
-				listTeamFront.add(tempSh.getNick());
-			} else {
-				listTeamBack.add(tempSh.getNick());
+		
+		System.out.println("listClient 사이즈 : "+listClient.size());
+		try {
+			for (int i = 0; i < listClient.size(); i++) {
+				tempSh = listClient.get(i);
+					if (tempSh.getTeam().equals("앞")) {
+						listTeamFront.add(tempSh.getNick());
+					} else {
+						listTeamBack.add(tempSh.getNick());
+					}
 			}
+		} catch (NullPointerException e) {
+			JOptionPane.showMessageDialog(dsv, "유저들이 아직 팀을 선택하지 않았습니다.");
 		}
 		
-		if (listTeamFront.size() == listTeamBack.size()) {
-			// 팀 분배 성공
-			for (int i=0; i<listClient.size(); i++) {
-				tempSh = listClient.get(i);
-				tempSh.broadcast("팀 분배에 실패했습니다.. 다시 선택해주세요.");
-			}
-		} else {
+		if (!(listTeamFront.size() == listTeamBack.size())) {
 			// 팀 분배 실패
+			tempSh = listClient.get(0);
+			tempSh.broadcast("팀 분배에 실패했습니다.. 다시 선택해주세요.");
+			dsv.getJtaLogs().append("팀 분배에 실패했습니다.\n");
+			dsv.getJspLogs().getVerticalScrollBar().setValue(dsv.getJspLogs().getVerticalScrollBar().getMaximum());
+		} else {
+			// 팀 분배 성공
+			boolean sendFrontTeamFlag = false;
+			boolean sendBackTeamFlag = false;
+			
 			for (int i=0; i<listClient.size(); i++) {
 				tempSh = listClient.get(i);
-				// 여기서 팀에 따라 분배///////////////////////////////////////////////////
-				if (tempSh.getTeam().equals("앞")) {
-					tempSh.broadcast("팀 분배에 성공했습니다. 같은 팀원은\n");
+				
+				if (tempSh.getTeam().equals("앞") && !sendFrontTeamFlag) {
+					StringBuilder msg = new StringBuilder();
+					msg.append("팀 분배에 성공했습니다. ");
+					msg.append("앞을 선택한 팀원은 ");
 					for(int j=0; j<listTeamFront.size(); j++) {
-						tempSh.broadcast(listTeamFront.get(j).getN);
+						if (j == listTeamFront.size()-1) {
+							msg.append(listTeamFront.get(j));
+						} else {
+							msg.append(listTeamFront.get(j)).append(", ");
+						}
 					}
+					msg.append(" 입니다.");
+					tempSh.broadcast(msg.toString());
+					sendFrontTeamFlag = true;
+					dsv.getJtaLogs().append(msg.toString()+"\n");
+					dsv.getJspLogs().getVerticalScrollBar().setValue(dsv.getJspLogs().getVerticalScrollBar().getMaximum());
 				}
 				
+				if (tempSh.getTeam().equals("뒤") && !sendBackTeamFlag) {
+					StringBuilder msg = new StringBuilder();
+					msg.append("팀 분배에 성공했습니다. ");
+					msg.append("뒤를 선택한 팀원은 ");
+					for(int j=0; j<listTeamBack.size(); j++) {
+						if (j == listTeamBack.size()-1) {
+							msg.append(listTeamBack.get(j));
+						} else {
+							msg.append(listTeamBack.get(j)).append(", ");
+						}
+					}
+					msg.append(" 입니다.");
+					tempSh.broadcast(msg.toString());
+					sendBackTeamFlag = true;
+					dsv.getJtaLogs().append(msg.toString()+"\n");
+					dsv.getJspLogs().getVerticalScrollBar().setValue(dsv.getJspLogs().getVerticalScrollBar().getMaximum());
+				}
 			}
 		}
 	}
@@ -125,7 +160,7 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			JTextArea jtaTemp = dsv.getJtaLogs();
 			for(int cnt=1;;cnt++) {
 				someClient = server.accept();
-				dsh = new DedenjjiServerHelper(someClient, dlmTemp, jtaTemp, cnt, dsv, listClient, divideTeamFlag);
+				dsh = new DedenjjiServerHelper(someClient, dlmTemp, jtaTemp, cnt, dsv, listClient, this, dsv.getJspLogs());
 				listClient.add(dsh);
 				dsh.start();
 			}
@@ -154,5 +189,9 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 	@Override
 	public void windowClosed(WindowEvent e) {
 		close();
+	}
+
+	public void setDivideTeamFlag(boolean divideTeamFlag) {
+		this.divideTeamFlag = divideTeamFlag;
 	}
 }
