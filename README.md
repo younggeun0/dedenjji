@@ -4,7 +4,7 @@
 * 짝수 인원이 서버에 접속, 앞/뒤 선택 후 서버에 전송
   * 앞/뒤 선택 쌍이 맞다면 서버가 결과를 클라이언트들에게 출력
   
-## 초기 UI 디자인
+## UI 디자인
 
 ### 클라이언트
 
@@ -24,4 +24,17 @@
 ![serverUI](https://github.com/younggeun0/dedenjji/blob/master/img/serverUI.png?raw=true)
 
 
+## 구현 UI
+
+### 클라이언트
+
+![clinetUI](https://github.com/younggeun0/dedenjji/blob/master/img/client.png?raw=true)
+
+### 서버
+
+![serverUI](https://github.com/younggeun0/dedenjji/blob/master/img/server.png?raw=true)
+
+## 시연 모습
+
+![impl](https://github.com/younggeun0/dedenjji/blob/master/img/impl.png?raw=true)
 
