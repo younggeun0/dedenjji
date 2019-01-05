@@ -1,13 +1,21 @@
 package dedenjji.server.evt;
 
+import java.awt.FileDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -69,6 +77,28 @@ public class DedenjjiServerEvt extends WindowAdapter implements ActionListener, 
 			// system log를 .dat파일로 출력하는 버튼
 			// 객체화하여 읽을 수 없는 내용으로 출력
 			if (!dsv.getJtaLogs().getText().isEmpty()) {
+				
+				FileDialog fd = new FileDialog(dsv, "로그 저장", FileDialog.SAVE);
+				fd.setVisible(true);
+				
+				String fileDir = fd.getDirectory();
+				String fileName = fd.getFile();
+				
+				Date date = new Date();
+				
+				File file = new File(fd.getDirectory()+"\\"+fd.getFile()+"_"+date.getTime()+".dat");
+				
+				try {
+					BufferedWriter br = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+					br.write(dsv.getJtaLogs().getText());
+					br.flush();
+					JOptionPane.showMessageDialog(dsv, "로그 저장 성공");
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(dsv, "로그 저장 실패");
+					e1.printStackTrace();
+				}
 				
 			} else {
 				JOptionPane.showMessageDialog(dsv, "저장할 로그가 없습니다.");
